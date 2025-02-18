@@ -29,6 +29,13 @@
   the License.
 */
 
+/**
+ * This forked vesrion contains some extra functions on file and folder
+ * file.getBlob() like DriveApp this function will work on file not supported by export function, it will return file's bolb.
+ * file.getRootFolder will return the file's root folder
+ * Folder.createFile(blob) this new function is copy of DriveApps folder.createFile 
+ */
+
 ////////////////////////////////////////// ReDriveApp //////////////////////////////////////////////
 
 // Static class methods for ReDriveApp
@@ -43,7 +50,9 @@ this['ReDriveApp'] = {
   getFilesByName: getFilesByName,
   searchFiles: searchFiles,
   searchFolders: searchFolders,
-  setDriveApiVersion: setDriveApiVersion
+  getRootFolder: getRootFolder,
+  setDriveApiVersion: setDriveApiVersion,
+  
 };
 
 // Global DriveApiVersion_ must be set to 2 or 3 before anything
@@ -311,6 +320,9 @@ function createFolder(name, optionalParentId) {
   }
 }
 
+function getRootFolder() {
+  return ReDriveApp.getFolderById('root');
+}
 /*
 // note: Removing as I learned this call only works if have the full /drive scope.
 function getRootFolder() {
@@ -461,6 +473,33 @@ reFileBaseClass_.getAs = function getAs(mimeType) {
     throw new Error('ReFile.getAs() does not support non Google Workspace types: ' + mimeType);
   }
 
+}
+
+reFileBaseClass_.getBlob = function getBlob(){
+
+  let url;
+  if (getDriveApiVersion_() === 2) {
+    url = 'https://www.googleapis.com/drive/v2/files/'
+        + this.base.driveFilesResource.id+ "?alt=media";
+  } else {
+    url = 'https://www.googleapis.com/drive/v3/files/'
+        + this.base.driveFilesResource.id+ "?alt=media";
+  }
+
+  const response = UrlFetchApp.fetch(url, {
+    headers: {
+      Authorization: 'Bearer ' + ScriptApp.getOAuthToken()
+    }
+  });
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error('ReFile.getBlob(): Drive API returned error ' + response.getResponseCode() 
+      + ': ' + response.getContentText());
+  }
+
+  const blob = response.getBlob();
+  return blob;
+  
 }
 
 MAKE_COPY_SIG_NO_ARGS = 1;
@@ -1072,6 +1111,29 @@ reFolderBaseClass_.searchFiles = function searchFiles(params) {
 reFolderBaseClass_.searchFolders = function searchFolders(params) {
   return searchFilesOrFolders_(params, true, this.getId());
 }
+reFolderBaseClass_.createFile = function createFile(blob){
+  if (getDriveApiVersion_() === 3) {
+    throw new Error('createFile() not yet supported by ReDriveApp for Drive API v3')
+  } else {
+    var newFile = {
+      title: blob.getName(),
+      mimeType: blob.getContentType(),
+      parents: [
+        {
+          id: this.getId()
+        }
+      ]
+    };
+    
+    var driveFilesResource = Drive.Files.insert(newFile, blob); 
+    
+    return new ReFile_.Base({
+      driveFilesResource: driveFilesResource, // 'Files' recourse from Drive API
+    });
+  }
+  
+}
+
 
 ////////////////////////////////////////// ReUser //////////////////////////////////////////////////
 // Define ReUser class. This is an equivalent to the 'User' class returned by

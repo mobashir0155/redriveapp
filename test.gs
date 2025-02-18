@@ -49,6 +49,14 @@ function testReDriveApp() {
     return;
   }
 
+  //test getBlob
+  const mapFileBlob = mapFile.getBlob()
+  if(!mapFileBlob || !mapFileBlob.getBytes()){
+    console.log("ReDriveApp getBlob error 1: file name: " + mapFile.getName());
+    testCleanup();
+    return;
+  }
+
   var txtFile = ReDriveApp.createFile(fileName + ".txt", dataText, MimeType.PLAIN_TEXT);
   txtFile = ReDriveApp.getFileById(txtFile.getId());
   if (txtFile.getName() !== fileName + ".txt") {
@@ -90,6 +98,15 @@ function testReDriveApp() {
 
   // test addViewer
   copy.addViewer(shareWithAccount);
+
+console.log(destFolder)
+  // test folder.createFile
+  var fileInFolder = destFolder.createFile(blob)
+  if(!fileInFolder.getId()){
+    console.log("ReFile createFile error");
+    testCleanup();
+    return;
+  }
 
   var pdfExportBlob = copy.getAs('application/pdf');
   pdfExportBlob.setName('newly exported.pdf')
