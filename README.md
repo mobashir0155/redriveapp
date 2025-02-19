@@ -15,6 +15,11 @@ Apps Script class that provides equivalent methods offered by the built-in Drive
 ## Uses
 ReDriveApp is intended as a (mostly) drop-in replacement for projects that wish to migrate away from DriveApp, as the latter automatically forces use of the full /auth/drive scope in Apps Script projects, which is a Restricted scope. Restricted Drive scopes can raise concerns from users and admins based on the extensive level of access they request. They also require additional reviews from Google and/or 3rd-party security auditors if you wish to publish your Apps Script project as a publicly available app (Add-on, Chat App, etc). In many cases though, projects don't really need the full Drive scope for common tasks, and the Recommended /auth/drive.file scope is sufficient.
 
+ * This fork contains some extra functions on file and folder
+ * file.getBlob() - like DriveApp this function will work on formats not supported by `export`.
+ * file.getRootFolder - returns the file's root folder
+ * Folder.createFile(blob) - This new function is copy of DriveApps folder.createFile 
+
 ## Requirements and Important Limitations
 <ol>
 <li> Requires use of Apps Script Advanced Services (Drive) defined with identifier 'Drive' in your Apps Script manifest file. </li>
