@@ -1,6 +1,6 @@
 /*
   ReDriveApp (short for "Recommended" or "Replacement" DriveApp)
-  https://github.com/googleworkspace/redriveapp
+  https://github.com/mobashir0155/redriveapp.git
 
   Provides equivalent methods offered by the built-in DriveApp, but that only require use of 
   '/drive.file' Drive OAuth scope (a "Recommended" OAuth scope). Requires use of Apps Script
